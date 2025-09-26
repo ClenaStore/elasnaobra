@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Relatórios</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
   <style>
     :root {
       --bg:#0b1220; --card:#101828; --ink:#e5f0ff; --muted:#9ca3af;
@@ -17,11 +20,12 @@
     h1 { text-align:center; margin-bottom:20px; }
     h2.section-title { margin:30px 0 15px; color:var(--brand); }
     .filters {
-      display:flex; flex-wrap:wrap; justify-content:center; gap:10px;
+      display:flex; flex-direction:column; align-items:center; gap:10px;
       margin-bottom:20px;
     }
     .filters input {
-      padding:8px 12px; border-radius:8px; border:1px solid var(--line);
+      width:100%; max-width:500px;
+      padding:10px 14px; border-radius:8px; border:1px solid var(--line);
       font-size:14px;
     }
     .grid {
@@ -30,7 +34,7 @@
     }
     .card {
       background:var(--card); border-radius:12px; overflow:hidden;
-      box-shadow:0 2px 6px rgba(0,0,0,0.25); transition:.3s;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:.3s;
     }
     .card:hover { transform:translateY(-4px); }
     .card img {
@@ -42,8 +46,8 @@
     .card .date { font-size:12px; color:var(--muted); }
     .card a {
       display:inline-block; margin-top:10px; font-size:14px;
-      color:#fff; background:var(--brand); padding:6px 12px;
-      border-radius:6px; text-decoration:none;
+      color:#fff; background:var(--brand); padding:8px 14px;
+      border-radius:6px; text-decoration:none; font-weight:600;
     }
     .card a:hover { background:#2563eb; }
   </style>
@@ -53,8 +57,7 @@
 
   <div class="filters">
     <input type="text" id="search" placeholder="Pesquisar relatórios..." />
-    <input type="date" id="fromDate">
-    <input type="date" id="toDate">
+    <input type="text" id="dateRange" placeholder="Filtrar por período" />
   </div>
 
   <!-- === SEÇÃO 1 === -->
@@ -66,12 +69,12 @@
         <h3>Relatório Financeiro</h3>
         <p>Evolução 2024 - 2025</p>
         <p class="date">📅 25/09/2025</p>
-        <a href="https://drive.google.com/uc?export=download&id=1GbaVF_qbuNGMARAif3JzJlGc1pvqMrI9" download>Baixar</a>
+        <a href="https://drive.google.com/uc?export=download&id=1GbaVF_qbuNGMARAif3JzJlGc1pvqMrI9" download>⬇ Baixar</a>
       </div>
     </div>
   </div>
 
-  <!-- === SEÇÃO 2 (adicione mais quando quiser) === -->
+  <!-- === SEÇÃO 2 === -->
   <h2 class="section-title">Comercial</h2>
   <div class="grid section">
     <div class="card" data-date="2025-08-10">
@@ -80,20 +83,34 @@
         <h3>Relatório Comercial</h3>
         <p>Resumo de vendas</p>
         <p class="date">📅 10/08/2025</p>
-        <a href="#" download>Baixar</a>
+        <a href="#" download>⬇ Baixar</a>
       </div>
     </div>
   </div>
 
   <script>
     const searchInput = document.getElementById("search");
-    const fromDateInput = document.getElementById("fromDate");
-    const toDateInput = document.getElementById("toDate");
+    const dateRangeInput = document.getElementById("dateRange");
+
+    // Inicializa Flatpickr com range
+    flatpickr("#dateRange", {
+      mode: "range",
+      dateFormat: "d/m/Y",
+      locale: "pt",
+      onClose: filtrar
+    });
 
     function filtrar() {
       const termo = searchInput.value.toLowerCase();
-      const fromDate = fromDateInput.value ? new Date(fromDateInput.value) : null;
-      const toDate = toDateInput.value ? new Date(toDateInput.value) : null;
+
+      let fromDate = null;
+      let toDate = null;
+
+      const range = dateRangeInput.value.split(" até ");
+      if (range.length === 2) {
+        fromDate = new Date(range[0].split("/").reverse().join("-"));
+        toDate = new Date(range[1].split("/").reverse().join("-"));
+      }
 
       document.querySelectorAll(".card").forEach(card => {
         const text = card.innerText.toLowerCase();
@@ -110,8 +127,6 @@
     }
 
     searchInput.addEventListener("input", filtrar);
-    fromDateInput.addEventListener("change", filtrar);
-    toDateInput.addEventListener("change", filtrar);
   </script>
 </body>
 </html>
