@@ -46,29 +46,52 @@
     }
 
 <style>
-  /* Grid responsivo */
+/* Grid responsivo */
+.grid {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Celular: 1 card por linha */
+@media (max-width: 768px) {
   .grid {
-    display:grid;
-    gap:20px;
-    padding:20px;
+    grid-template-columns: 1fr;
   }
+}
 
-  /* Mobile: 1 card por linha */
-  @media (max-width:768px) {
-    .grid { grid-template-columns:1fr; }
+/* Tablet: 3 cards por linha */
+@media (min-width: 769px) and (max-width: 1199px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
   }
+}
 
-  /* Desktop: exatamente 5 colunas */
-  @media (min-width:769px) {
-    .grid { grid-template-columns:repeat(5, 1fr); }
+/* Desktop: exatamente 5 cards por linha */
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(5, 1fr);
   }
+}
 
-  .card {
-    background:var(--card); border-radius:12px; overflow:hidden;
-    box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:.3s;
-    display:flex; flex-direction:column;
-  }
-  .card img { width:100%; height:140px; object-fit:cover; } /* altura reduzida */
+/* Ajuste nos cards */
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: .3s;
+  display: flex;
+  flex-direction: column;
+  max-width: 280px;   /* evita que fiquem muito largos */
+  margin: auto;       /* centraliza quando sobrar espaço */
+}
+.card img {
+  width: 100%;
+  height: 140px;       /* altura fixa da capa */
+  object-fit: cover;
+}
+
 </style>
 
   </style>
