@@ -2,125 +2,96 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Elas na Obra</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatórios</title>
   <style>
     :root {
-      --pink: #e91e63;
-      --dark: #0f172a;
-      --white: #ffffff;
-      --gray: #f1f5f9;
-      --brand: #ff4081;
+      --bg:#0b1220; --card:#101828; --ink:#e5f0ff; --muted:#9ca3af;
+      --brand:#3b82f6; --line:#1f2937;
     }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
+    * { box-sizing: border-box; }
     body {
-      background: var(--gray);
-      color: var(--dark);
-      line-height: 1.6;
+      margin:0; padding:20px; font-family:Inter, sans-serif;
+      background:var(--bg); color:var(--ink);
     }
-    header {
-      background: var(--pink);
-      color: var(--white);
-      padding: 20px;
-      text-align: center;
+    h1 { text-align:center; margin-bottom:20px; }
+    #search {
+      width:100%; max-width:500px; margin:0 auto 20px; display:block;
+      padding:10px 14px; border-radius:8px; border:1px solid var(--line);
+      font-size:16px; background:#fff; color:#000;
     }
-    header img {
-      max-width: 150px;
-      border-radius: 12px;
-      margin-bottom: 10px;
+    .grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+      gap:20px;
     }
-    header h1 {
-      font-size: 1.8rem;
-      font-weight: 800;
+    .card {
+      background:var(--card); border-radius:12px; overflow:hidden;
+      box-shadow:0 2px 6px rgba(0,0,0,0.25); transition:.3s;
     }
-    main {
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
+    .card:hover { transform:translateY(-4px); }
+    .card img {
+      width:100%; height:160px; object-fit:cover;
     }
-    .banner {
-      background: var(--white);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    .card-content { padding:15px; }
+    .card h2 { margin:0 0 8px; font-size:18px; color:var(--brand); }
+    .card p { margin:0 0 8px; font-size:14px; color:var(--ink); }
+    .card .date { font-size:12px; color:var(--muted); }
+    .card a {
+      display:inline-block; margin-top:10px; font-size:14px;
+      color:#fff; background:var(--brand); padding:6px 12px;
+      border-radius:6px; text-decoration:none;
     }
-    .banner h2 {
-      color: var(--pink);
-      font-size: 1.6rem;
-      margin-bottom: 10px;
-    }
-    .banner p {
-      font-size: 1rem;
-      margin-bottom: 15px;
-    }
-    .social {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-    .social a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--pink);
-      color: var(--white);
-      text-decoration: none;
-      font-weight: 600;
-      padding: 12px 20px;
-      border-radius: 8px;
-      transition: 0.3s;
-    }
-    .social a:hover {
-      background: var(--brand);
-    }
-    .social img {
-      width: 22px;
-      margin-right: 8px;
-    }
-    footer {
-      text-align: center;
-      padding: 20px;
-      margin-top: 30px;
-      font-size: 0.9rem;
-      color: #555;
-    }
+    .card a:hover { background:#2563eb; }
   </style>
 </head>
 <body>
-  <header>
-    <img src="3b0b5558-4937-4cd7-908f-8468464c7941.jpg" alt="Elas na Obra Logo">
-    <h1>ELAS na OBRA</h1>
-  </header>
+  <h1>📑 Relatórios</h1>
+  <input type="text" id="search" placeholder="Pesquisar relatórios..." />
 
-  <main>
-    <section class="banner">
-      <h2>Limpeza Profissional</h2>
-      <p>
-        Limpeza leve e pesada, pós-obra, residencial, comercial e rejunte de todos os tipos.  
-        Atendimento especializado para transformar o seu ambiente.
-      </p>
-      <div class="social">
-        <a href="https://wa.me/5577988587588" target="_blank">
-          <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp"> WhatsApp
-        </a>
-        <a href="https://instagram.com/seu_instagram" target="_blank">
-          <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram"> Instagram
-        </a>
-      </div>
-    </section>
-  </main>
+  <div id="relatorios" class="grid"></div>
 
-  <footer>
-    © 2025 Elas na Obra - Todos os direitos reservados
-  </footer>
+  <script>
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbyiLWk0KeHExM5DZYbJRxC_UfsN7OLuyFqFihFN5vPNkEQp4C_akKphdk-pphD51hYKBw/exec"; // ex: https://script.google.com/macros/s/.../exec
+
+    async function carregarRelatorios() {
+      const res = await fetch(SHEET_URL);
+      const dados = await res.json(); 
+      render(dados);
+      
+      document.querySelector("#search").addEventListener("input", e => {
+        const termo = e.target.value.toLowerCase();
+        const filtrado = dados.filter(r =>
+          r.Nome.toLowerCase().includes(termo) ||
+          r.Subtitulo.toLowerCase().includes(termo)
+        );
+        render(filtrado);
+      });
+    }
+
+    function render(lista) {
+      const container = document.getElementById("relatorios");
+      container.innerHTML = "";
+      if(lista.length === 0){
+        container.innerHTML = "<p>Nenhum relatório encontrado.</p>";
+        return;
+      }
+      lista.forEach(r => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <img src="${r.Capa}" alt="Capa do relatório">
+          <div class="card-content">
+            <h2>${r.Nome}</h2>
+            <p>${r.Subtitulo}</p>
+            <p class="date">📅 ${r.DataPublicacao}</p>
+            <a href="${r.LinkRelatorio}" target="_blank">Baixar</a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    carregarRelatorios();
+  </script>
 </body>
 </html>
