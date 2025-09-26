@@ -15,6 +15,7 @@
       background:var(--bg); color:var(--ink);
     }
     h1 { text-align:center; margin-bottom:20px; }
+    h2.section-title { margin:30px 0 15px; color:var(--brand); }
     #search {
       width:100%; max-width:500px; margin:0 auto 20px; display:block;
       padding:10px 14px; border-radius:8px; border:1px solid var(--line);
@@ -33,7 +34,7 @@
       width:100%; height:160px; object-fit:cover;
     }
     .card-content { padding:15px; }
-    .card h2 { margin:0 0 8px; font-size:18px; color:var(--brand); }
+    .card h3 { margin:0 0 8px; font-size:18px; color:var(--brand); }
     .card p { margin:0 0 8px; font-size:14px; color:var(--ink); }
     .card .date { font-size:12px; color:var(--muted); }
     .card a {
@@ -48,50 +49,33 @@
   <h1>📑 Relatórios</h1>
   <input type="text" id="search" placeholder="Pesquisar relatórios..." />
 
-  <div id="relatorios" class="grid"></div>
+  <!-- === SEÇÃO 1 === -->
+  <h2 class="section-title">Financeiro</h2>
+  <div class="grid section">
+    <div class="card">
+      <img src="https://github.com/ClenaStore/elasnaobra/blob/main/paste/Relat%C3%B3rio%20Financeiro%20Individual.jpg?raw=true" alt="Capa do relatório">
+      <div class="card-content">
+        <h3>Relatório Financeiro</h3>
+        <p>Evolução 2024 - 2025</p>
+        <p class="date">📅 25/09/2025 14:30</p>
+        <a href="https://drive.google.com/file/d/1GbaVF_qbuNGMARAif3JzJlGc1pvqMrI9/view?usp=drive_link" download>Baixar</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- === SEÇÃO 2 (adicione mais quando quiser) === -->
+
 
   <script>
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbz5qDX0CGaHDDiI7jsFZCk_mLnNDFLLG0H5pQzEK3nTFkZ7zMRwt2hOWsB0poyKei5l3g/exec"; // ex: https://script.google.com/macros/s/.../exec
-
-    async function carregarRelatorios() {
-      const res = await fetch(SHEET_URL);
-      const dados = await res.json(); 
-      render(dados);
-      
-      document.querySelector("#search").addEventListener("input", e => {
-        const termo = e.target.value.toLowerCase();
-        const filtrado = dados.filter(r =>
-          r.Nome.toLowerCase().includes(termo) ||
-          r.Subtitulo.toLowerCase().includes(termo)
-        );
-        render(filtrado);
+    // filtro de pesquisa
+    const searchInput = document.getElementById("search");
+    searchInput.addEventListener("input", e => {
+      const termo = e.target.value.toLowerCase();
+      document.querySelectorAll(".card").forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(termo) ? "block" : "none";
       });
-    }
-
-    function render(lista) {
-      const container = document.getElementById("relatorios");
-      container.innerHTML = "";
-      if(lista.length === 0){
-        container.innerHTML = "<p>Nenhum relatório encontrado.</p>";
-        return;
-      }
-      lista.forEach(r => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <img src="${r.Capa}" alt="Capa do relatório">
-          <div class="card-content">
-            <h2>${r.Nome}</h2>
-            <p>${r.Subtitulo}</p>
-            <p class="date">📅 ${r.DataPublicacao}</p>
-            <a href="${r.LinkRelatorio}" download>Baixar</a>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    carregarRelatorios();
+    });
   </script>
 </body>
 </html>
