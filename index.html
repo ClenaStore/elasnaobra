@@ -17,41 +17,49 @@
       margin:0; padding:0; font-family:Inter, sans-serif;
       background:var(--bg); color:var(--ink);
     }
-    h1 { text-align:center; margin:80px 0 20px; } /* espaço para barra fixa */
+    h1 { text-align:center; margin:100px 0 20px; } /* espaço para barra fixa */
     h2.section-title { margin:30px 0 15px; color:var(--brand); }
 
     /* Barra de filtros fixa */
     .filters {
       position:fixed; top:0; left:0; right:0;
-      background:var(--bg); padding:10px; 
-      display:flex; gap:10px; justify-content:center;
+      background:var(--bg); padding:10px 20px;
+      display:flex; gap:10px;
       border-bottom:1px solid var(--line);
       z-index:1000;
     }
     .filters input {
-      flex:1; padding:10px 14px; border-radius:8px;
-      border:1px solid var(--line); font-size:14px;
+      flex:1;
+      padding:10px 14px;
+      border-radius:8px;
+      border:1px solid var(--line);
+      font-size:14px;
       min-width:0;
     }
 
+    /* Grid de cards */
     .grid {
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-      gap:20px; padding:0 20px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+      gap:20px;
+      padding:0 20px;
     }
     .card {
       background:var(--card); border-radius:12px; overflow:hidden;
       box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:.3s;
+      display:flex; flex-direction:column;
     }
     .card:hover { transform:translateY(-4px); }
     .card img { width:100%; height:160px; object-fit:cover; }
-    .card-content { padding:15px; }
+    .card-content { padding:15px; flex:1; display:flex; flex-direction:column; }
     .card h3 { margin:0 0 8px; font-size:18px; color:var(--brand); }
     .card p { margin:0 0 8px; font-size:14px; color:var(--ink); }
-    .card .date { font-size:12px; color:var(--muted); }
+    .card .date { font-size:12px; color:var(--muted); margin-top:auto; }
     .card a {
       display:inline-block; margin-top:10px; font-size:14px;
       color:#fff; background:var(--brand); padding:8px 14px;
       border-radius:6px; text-decoration:none; font-weight:600;
+      text-align:center;
     }
     .card a:hover { background:#2563eb; }
   </style>
@@ -77,11 +85,6 @@
         <a href="https://drive.google.com/uc?export=download&id=1GbaVF_qbuNGMARAif3JzJlGc1pvqMrI9" download>⬇ Baixar</a>
       </div>
     </div>
-  </div>
-
-  <!-- === SEÇÃO 2 === -->
-  <h2 class="section-title">Comercial</h2>
-  <div class="grid section">
     <div class="card" data-date="2025-08-10">
       <img src="https://via.placeholder.com/400x200.png?text=Comercial" alt="Capa do relatório">
       <div class="card-content">
@@ -124,7 +127,7 @@
         if (fromDate && cardDate < fromDate) matchDate = false;
         if (toDate && cardDate > toDate) matchDate = false;
 
-        card.style.display = (matchText && matchDate) ? "block" : "none";
+        card.style.display = (matchText && matchDate) ? "flex" : "none";
       });
     }
 
