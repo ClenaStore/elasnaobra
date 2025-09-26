@@ -16,10 +16,13 @@
     }
     h1 { text-align:center; margin-bottom:20px; }
     h2.section-title { margin:30px 0 15px; color:var(--brand); }
-    #search {
-      width:100%; max-width:500px; margin:0 auto 20px; display:block;
-      padding:10px 14px; border-radius:8px; border:1px solid var(--line);
-      font-size:16px; background:#fff; color:#000;
+    .filters {
+      display:flex; flex-wrap:wrap; justify-content:center; gap:10px;
+      margin-bottom:20px;
+    }
+    .filters input {
+      padding:8px 12px; border-radius:8px; border:1px solid var(--line);
+      font-size:14px;
     }
     .grid {
       display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
@@ -47,35 +50,68 @@
 </head>
 <body>
   <h1>📑 Relatórios</h1>
-  <input type="text" id="search" placeholder="Pesquisar relatórios..." />
+
+  <div class="filters">
+    <input type="text" id="search" placeholder="Pesquisar relatórios..." />
+    <input type="date" id="fromDate">
+    <input type="date" id="toDate">
+  </div>
 
   <!-- === SEÇÃO 1 === -->
   <h2 class="section-title">Financeiro</h2>
   <div class="grid section">
-    <div class="card">
+    <div class="card" data-date="2025-09-25">
       <img src="https://github.com/ClenaStore/elasnaobra/blob/main/paste/Relat%C3%B3rio%20Financeiro%20Individual.png?raw=true" alt="Capa do relatório">
       <div class="card-content">
         <h3>Relatório Financeiro</h3>
         <p>Evolução 2024 - 2025</p>
         <p class="date">📅 25/09/2025</p>
-       <a href="https://drive.google.com/uc?export=download&id=1GbaVF_qbuNGMARAif3JzJlGc1pvqMrI9" download>Baixar</a>
+        <a href="https://drive.google.com/uc?export=download&id=1GbaVF_qbuNGMARAif3JzJlGc1pvqMrI9" download>Baixar</a>
       </div>
     </div>
   </div>
 
   <!-- === SEÇÃO 2 (adicione mais quando quiser) === -->
-
+  <h2 class="section-title">Comercial</h2>
+  <div class="grid section">
+    <div class="card" data-date="2025-08-10">
+      <img src="https://via.placeholder.com/400x200.png?text=Comercial" alt="Capa do relatório">
+      <div class="card-content">
+        <h3>Relatório Comercial</h3>
+        <p>Resumo de vendas</p>
+        <p class="date">📅 10/08/2025</p>
+        <a href="#" download>Baixar</a>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // filtro de pesquisa
     const searchInput = document.getElementById("search");
-    searchInput.addEventListener("input", e => {
-      const termo = e.target.value.toLowerCase();
+    const fromDateInput = document.getElementById("fromDate");
+    const toDateInput = document.getElementById("toDate");
+
+    function filtrar() {
+      const termo = searchInput.value.toLowerCase();
+      const fromDate = fromDateInput.value ? new Date(fromDateInput.value) : null;
+      const toDate = toDateInput.value ? new Date(toDateInput.value) : null;
+
       document.querySelectorAll(".card").forEach(card => {
         const text = card.innerText.toLowerCase();
-        card.style.display = text.includes(termo) ? "block" : "none";
+        const cardDate = new Date(card.getAttribute("data-date"));
+
+        let matchText = text.includes(termo);
+        let matchDate = true;
+
+        if (fromDate && cardDate < fromDate) matchDate = false;
+        if (toDate && cardDate > toDate) matchDate = false;
+
+        card.style.display = (matchText && matchDate) ? "block" : "none";
       });
-    });
+    }
+
+    searchInput.addEventListener("input", filtrar);
+    fromDateInput.addEventListener("change", filtrar);
+    toDateInput.addEventListener("change", filtrar);
   </script>
 </body>
 </html>
