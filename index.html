@@ -1,220 +1,212 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Relatórios</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
-  <style>
-    :root {
-      --bg:#0b1220; --card:#101828; --ink:#e5f0ff; --muted:#9ca3af;
-      --brand:#3b82f6; --line:#1f2937;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin:0; padding:0; font-family:Inter, sans-serif;
-      background:var(--bg); color:var(--ink);
-    }
+<meta charset="UTF-8" />
+<title>Aprovação de CAP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+<style>
+:root{
+  --bg:#0e1625;--card:#1b2436;--ink:#f1f5f9;--muted:#9ca3af;--line:#2c3548;
+  --teal:#06b6d4;--blue:#3b82f6;--green:#16a34a;--red:#ef4444;--amber:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.4}
 
-    /* Cabeçalho fixo */
-    header {
-      position:sticky; top:0;
-      background:var(--bg);
-      z-index:1000;
-      border-bottom:1px solid var(--line);
-    }
-    header h1 {
-      text-align:center;
-      margin:0;
-      padding:15px 10px;
-    }
-    .filters {
-      display:flex; gap:10px;
-      padding:10px 20px;
-    }
-    .filters input {
-      flex:1;
-      padding:10px 14px;
-      border-radius:8px;
-      border:1px solid var(--line);
-      font-size:14px;
-      min-width:0;
-    }
+/* HEADER */
+header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#1b2436,#0e1625);
+  border-bottom:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:10px}
+header h1{font-size:18px;margin:0;font-weight:800}
 
-    /* Grid responsivo */
-    .grid {
-      display: grid;
-      gap: 20px;
-      padding: 20px;
-    }
-    @media (max-width: 768px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-    @media (min-width: 769px) and (max-width: 1199px) {
-      .grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (min-width: 1200px) {
-      .grid { grid-template-columns: repeat(5, 1fr); }
-    }
+/* FILTERS */
+.controls{width:100%;display:flex;flex-direction:column;gap:10px}
+.row-filtros,.row-linha{display:flex;gap:8px;width:100%;flex-wrap:wrap}
+select,input{background:#0f1a2e;border:1px solid #2c3548;color:var(--ink);
+  padding:10px 14px;border-radius:10px;font-size:14px;flex:1;min-width:140px}
+.btn{border:1px solid transparent;background:var(--blue);color:#fff;padding:10px 14px;
+  border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;flex:1;min-width:120px;text-align:center;transition:.2s}
+.btn:hover{opacity:.9;transform:scale(1.02)}
 
-    /* Cards */
-    .card {
-      background: var(--card);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      transition: .3s;
-      display: flex;
-      flex-direction: column;
-      cursor:pointer;
-    }
-    .card:hover { transform:translateY(-4px); }
-    .card img { width: 100%; height: 140px; object-fit: cover; }
-    .card-content { padding:15px; flex:1; }
-    .card h3 { margin:0 0 8px; font-size:16px; color:var(--brand); }
-    .card p { margin:0 0 6px; font-size:14px; }
-    .card .date { font-size:12px; color:var(--muted); }
+/* LOADER */
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:100}
+.spinner{width:60px;height:60px;border:6px solid var(--teal);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-    /* Popup modal */
-    .modal {
-      display:none;
-      position:fixed;
-      top:0; left:0; right:0; bottom:0;
-      background:rgba(0,0,0,0.8);
-      z-index:2000;
-      justify-content:center;
-      align-items:center;
-      padding:20px;
-    }
-    .modal-content {
-      background:#fff;
-      border-radius:8px;
-      width:100%; max-width:1000px;
-      height:90vh;
-      display:flex;
-      flex-direction:column;
-    }
-    .modal-header {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:10px; background:#f3f4f6;
-    }
-    .modal-header h2 {
-      margin:0; font-size:16px; color:#111;
-    }
-    .modal-header button {
-      border:none; background:red; color:#fff; padding:4px 10px;
-      border-radius:4px; cursor:pointer;
-    }
-    iframe {
-      flex:1;
-      border:none;
-      width:100%;
-    }
-  </style>
+/* CONTAINER */
+.container{padding:16px;max-width:1250px;margin:0 auto}
+
+/* STATUS CARDS */
+.status-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:12px 0}
+.status-card{border-radius:12px;padding:12px;font-weight:700;display:flex;flex-direction:column;gap:4px;align-items:flex-start;color:#fff;font-size:14px}
+.status-card.aprovado{background:linear-gradient(135deg,#19c37d,#16a34a)}
+.status-card.negado{background:linear-gradient(135deg,#fb6969,#ef4444)}
+.status-card.pendente{background:linear-gradient(135deg,#60a5fa,#1d4ed8)}
+
+/* MODS */
+.mods-card{margin:16px 0;background:#1b2436;border:1px solid var(--line);border-radius:18px;padding:16px}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.mod{border-radius:14px;padding:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;color:#fff;font-size:15px}
+.mod.total{background:#0f1a2e;border:1px solid var(--line)}
+.mod.pix{background:linear-gradient(135deg,#3b82f6,#1e40af)}
+.mod.cartao{background:linear-gradient(135deg,#22c55e,#15803d)}
+.mod.boleto{background:linear-gradient(135deg,#9ca3af,#374151)}
+
+/* LISTA */
+.list-head{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:15px}
+.lista{display:grid;gap:14px;margin-top:14px}
+.titulo{background:linear-gradient(180deg,#1b2436,#141c2b);border:1px solid var(--line);
+  border-radius:16px;padding:14px;display:grid;gap:8px;position:relative}
+.ck input{width:20px;height:20px}
+.row{display:flex;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.row b{color:var(--ink);font-size:15px}
+.row.hist{color:var(--amber);font-weight:600;font-size:13px}
+.pill{padding:6px 12px;border-radius:999px;border:1px solid #2a3955;background:#0f1a2e;font-size:13px;font-weight:700;position:absolute;top:10px;right:10px}
+.pill.ok{border-color:#155e32;color:#b6f3c5;background:#0e2a1b}
+.pill.warn{border-color:#7a1e1e;color:#ffb4b4;background:#2a0e0e}
+
+/* ACTIONS */
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.mini{flex:1 1 calc(33% - 6px);padding:8px;border-radius:12px;background:#0f1a2e;color:#fff;font-weight:700;cursor:pointer;font-size:14px;text-align:center;transition:.2s}
+.mini.aprovar{background:linear-gradient(135deg,#19c37d,#16a34a)}
+.mini.negar{background:linear-gradient(135deg,#fb6969,#ef4444)}
+.mini.obs{background:linear-gradient(135deg,#60a5fa,#1d4ed8)}
+.mini:hover{opacity:.9;transform:scale(1.02)}
+
+/* FOOTER FIXO */
+.footer{position:fixed;right:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end;z-index:15}
+.bubble{background:var(--blue);color:#fff;border-radius:8px;padding:6px 10px;font-weight:700;font-size:13px;text-align:right;display:none;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.btn-massa{background:linear-gradient(135deg,var(--teal),#0796ad);color:#002027;border:0;border-radius:8px;padding:8px 14px;font-weight:700;font-size:14px;cursor:pointer;display:none;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.btn-massa.loading{opacity:.8;pointer-events:none}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(2,6,15,.65);display:none;align-items:center;justify-content:center;z-index:200}
+.modal .box{background:#1b2436;border:1px solid var(--line);border-radius:16px;max-width:95%;width:480px;padding:16px}
+.modal h3{margin:0 0 12px;font-size:18px}
+.modal .close{float:right;border:1px solid var(--line);background:#0f1a2e;border-radius:8px;color:#fff;padding:6px 12px;cursor:pointer;font-size:14px}
+textarea{width:100%;min-height:90px;border-radius:8px;border:1px solid #2c3548;background:#0f1a2e;color:#fff;padding:10px;font-size:14px}
+</style>
 </head>
 <body>
-  <!-- Cabeçalho fixo -->
-  <header>
-    <h1>Relatórios</h1>
-    <div class="filters">
-      <input type="text" id="search" placeholder="Pesquisar relatórios..." />
-      <input type="text" id="dateRange" placeholder="Período" />
+<header>
+  <h1>CAP - Grupo DV</h1>
+  <div class="controls">
+    <div class="row-filtros">
+      <select id="filtroStatus">
+        <option value="Pendente" selected>Pendentes</option>
+        <option value="Aprovado">Aprovados</option>
+        <option value="Negado">Negados</option>
+        <option value="Todos">Todos</option>
+      </select>
+      <select id="filtroMeio">
+        <option value="Todos" selected>Todos</option>
+        <option value="Pix">Pix</option>
+        <option value="Cartão">Cartão</option>
+        <option value="Boleto">Boleto</option>
+        <option value="Outros">Outros</option>
+      </select>
+      <input type="text" id="filtroPeriodo" placeholder="Selecione período" />
     </div>
-  </header>
-
-  <!-- === SEÇÃO 1 === -->
-  <h2 class="section-title">Financeiro</h2>
-  <div class="grid section">
-    <div class="card" data-date="2025-09-25" data-url="https://drive.google.com/file/d/1GbaVF_qbuNGMARAif3JzJlGc1pvqMrI9/preview">
-      <img src="https://github.com/ClenaStore/elasnaobra/blob/main/paste/Relat%C3%B3rio%20Financeiro%20Individual.png?raw=true" alt="Capa do relatório">
-      <div class="card-content">
-        <h3>Relatório Financeiro</h3>
-        <p>Evolução 2024 - 2025</p>
-        <p class="date">📅 25/09/2025</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- === SEÇÃO 2 === -->
-
-
-  <!-- Modal -->
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle">Visualizar Relatório</h2>
-        <button id="closeModal">X</button>
-      </div>
-      <iframe id="modalFrame" src=""></iframe>
+    <div class="row-linha">
+      <button class="btn" id="btnRefresh">🔄 Atualizar</button>
     </div>
   </div>
+</header>
 
-  <script>
-    const searchInput = document.getElementById("search");
-    const dateRangeInput = document.getElementById("dateRange");
-    const modal = document.getElementById("modal");
-    const modalFrame = document.getElementById("modalFrame");
-    const modalTitle = document.getElementById("modalTitle");
-    const closeModal = document.getElementById("closeModal");
+<div id="overlay"><div class="spinner"></div></div>
 
-    // Flatpickr com mês atual
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    flatpickr("#dateRange", {
-      mode: "range",
-      dateFormat: "d/m/Y",
-      locale: "pt",
-      defaultDate: [firstDay, lastDay],
-      onClose: filtrar
+<div class="container">
+  <div id="statusCards" class="status-cards"></div>
+  <div class="mods-card">
+    <div style="font-weight:800;margin-bottom:8px;font-size:16px">Modalidades</div>
+    <div id="mods" class="mods"></div>
+  </div>
+
+  <div class="list-head">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+      <input id="master" type="checkbox" />
+      <b>Selecionar todos</b>
+    </label>
+    <div id="contagem" style="color:var(--muted);font-size:14px">0 itens</div>
+  </div>
+
+  <div id="lista" class="lista"></div>
+</div>
+
+<div class="footer">
+  <div id="bubble" class="bubble">Total selecionado: R$ 0,00</div>
+  <button id="btnMassa" class="btn-massa"><span>Aprovar selecionados</span></button>
+</div>
+
+<!-- modal observação -->
+<div id="modalObs" class="modal">
+  <div class="box">
+    <button class="close" onclick="fecharObs()">Fechar</button>
+    <h3>Observação</h3>
+    <textarea id="textoObs" placeholder="Digite a observação..."></textarea>
+    <button class="btn" style="margin-top:10px" onclick="salvarObs()">Salvar</button>
+  </div>
+</div>
+
+<script>
+const endpointTitulos="URL_DO_SEU_GAS_AQUI"; // 🔹 Coloque a URL do GAS
+let TITULOS={},SELEC=[],obsContext={};
+let periodoInicio=null,periodoFim=null;
+
+const $=id=>document.getElementById(id);
+const BRL=n=>(isNaN(n)?0:n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const iso = d=>{const dt=new Date(d);dt.setMinutes(dt.getMinutes()-dt.getTimezoneOffset());return dt.toISOString().slice(0,10);};
+function normalizeMeio(meio){meio=(meio||"Outros").toLowerCase();if(meio.includes("pix"))return"Pix";if(meio.includes("cart"))return"Cartão";if(meio.includes("bol"))return"Boleto";return"Outros";}
+
+function setPill(el,status){el.className="pill";if(status==="Aprovado"){el.classList.add("ok");el.textContent="Aprovado"}else if(status==="Negado"){el.classList.add("warn");el.textContent="Negado"}else el.textContent=status;}
+function addHistLocal(id,texto){let hist=JSON.parse(localStorage.getItem("hist_"+id)||"[]");hist.push({data:new Date().toLocaleString("pt-BR"),texto});localStorage.setItem("hist_"+id,JSON.stringify(hist));}
+function getHistLocal(id){return JSON.parse(localStorage.getItem("hist_"+id)||"[]");}
+
+function renderMods(){/* igual ao anterior mas soma __all */}
+
+/* renderLista mostra OBS e usa coluna M como histórico */
+function renderLista(){
+  const lista=$("lista");lista.innerHTML="";SELEC=[];$("master").checked=false;
+  let totalItens=0;
+  for(const emp of Object.keys(TITULOS)){
+    (TITULOS[emp].__filtered||[]).forEach((t,i)=>{
+      totalItens++;
+      const valor=Number(String(t.valor).replace("R$","").replace(/\./g,"").replace(",","."))||0;
+      const id=`${emp}_${i}`;
+      const st=(t.status||"Pendente");
+      const obs=(t.observacao||"");
+      const histColuna=(t.historico||""); // 🔹 coluna M
+
+      const card=document.createElement("div");
+      card.className="titulo";card.dataset.id=id;card.dataset.emp=emp;card.dataset.linha=i;card.dataset.valor=valor;
+      card.innerHTML=`
+        <div class="ck"><input type="checkbox" onchange="toggleSel(this)" /></div>
+        <div class="info">
+          <div class="row"><b>${t.fornecedor}</b> • ${emp}</div>
+          <div class="row">Venc: <b>${iso(t.vencimento).split("-").reverse().join("/")}</b> • Meio: <b>${t.meio_pagamento||"Outros"}</b></div>
+          <div class="row">Valor: <b>${BRL(valor)}</b></div>
+          ${obs ? `<div class="row obs" style="color:#60a5fa">Obs: ${obs}</div>` : ""}
+          ${histColuna ? `<div class="row hist">Histórico: ${histColuna}</div>` : ""}
+        </div>
+        <span class="pill" data-status>${st}</span>
+        <div class="actions">
+          <button class="mini obs" onclick="abrirObs('${id}','${emp}',${i},\`${obs}\`,'${t.fornecedor}')">✏️ Obs</button>
+          <button class="mini negar" onclick="acaoStatus(this,'Negado')">✗ Negar</button>
+          <button class="mini aprovar" onclick="acaoStatus(this,'Aprovado')">✓ Aprovar</button>
+        </div>`;
+      card.addEventListener("dblclick",()=>{const chk=card.querySelector(".ck input");chk.checked=!chk.checked;toggleSel(chk);});
+      setPill(card.querySelector("[data-status]"),st);
+      lista.appendChild(card);
     });
+  }
+  $("contagem").textContent=`${totalItens} ${totalItens===1?"item":"itens"}`;
+}
 
-    // Filtro de pesquisa e data
-    function filtrar() {
-      const termo = searchInput.value.toLowerCase();
-      let fromDate = null, toDate = null;
-      const range = dateRangeInput.value.split(" até ");
-      if (range.length === 2) {
-        fromDate = new Date(range[0].split("/").reverse().join("-"));
-        toDate = new Date(range[1].split("/").reverse().join("-"));
-      }
-      document.querySelectorAll(".card").forEach(card => {
-        const text = card.innerText.toLowerCase();
-        const cardDate = new Date(card.getAttribute("data-date"));
-        let matchText = text.includes(termo);
-        let matchDate = true;
-        if (fromDate && cardDate < fromDate) matchDate = false;
-        if (toDate && cardDate > toDate) matchDate = false;
-        card.style.display = (matchText && matchDate) ? "flex" : "none";
-      });
-    }
-    searchInput.addEventListener("input", filtrar);
-    window.addEventListener("load", filtrar);
+/* TOGGLE seleção */
+function toggleSel(chk){/* igual ao anterior */}
 
-    // Clique no card abre modal
-    document.querySelectorAll(".card").forEach(card => {
-      card.addEventListener("click", () => {
-        const url = card.getAttribute("data-url");
-        const title = card.querySelector("h3").innerText;
-        modalTitle.textContent = title;
-        modalFrame.src = url;
-        modal.style.display = "flex";
-      });
-    });
-
-    // Fechar modal
-    closeModal.addEventListener("click", () => {
-      modal.style.display = "none";
-      modalFrame.src = "";
-    });
-    modal.addEventListener("click", e => {
-      if (e.target === modal) {
-        modal.style.display = "none";
-        modalFrame.src = "";
-      }
-    });
-  </script>
+/* acaoStatus, atualizarStatusMassa, abrirObs, salvarObs, fetchEmpresa, processarEmpresa, refresh -> mesmos do anterior adaptados para endpointTitulos */
+</script>
 </body>
 </html>
